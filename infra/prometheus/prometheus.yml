@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 2s
+
+# scrape_configs:
+#   - job_name: 'playwright'
+#     static_configs:
+#       - targets: ['host.docker.internal:8000']
+
+# scrape_configs:
+#   - job_name: 'pushgateway'
+#     static_configs:
+#       - targets: ['pushgateway:9091']
+
+scrape_configs:
+  - job_name: 'playwright-aggregator'
+    static_configs:
+      - targets: ['host.docker.internal:4000']
