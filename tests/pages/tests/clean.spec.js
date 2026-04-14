@@ -15,17 +15,15 @@ let productPage;
 
 test.describe.configure({ mode: 'serial' });
 
-// ------------------------------
+
 test.beforeAll(async () => {
   await startSuite(SUITE);
 });
 
-// ------------------------------
 test.afterAll(async () => {
   await endSuite(SUITE);
 });
 
-// ------------------------------
 test.beforeEach(async ({ page }) => {
   startMetrics = await getSystemMetrics();
   flipkart = new FlipkartPage(page);
@@ -64,9 +62,8 @@ test.afterEach(async ({}, testInfo) => {
     memory_mb: Number((deltaMemory < 0 ? 0 : deltaMemory).toFixed(2)),
     cpu: Number(endMetrics.cpu.toFixed(2)),
   });
-}); // ✅ THIS WAS MISSING
+}); 
 
-// ------------------------------
 test('Flipkart-api-assignment-test', async ({ page }) => {
         await test.step("Search for mouse", async () => {
             await flipkart.searchItem("mouse");
