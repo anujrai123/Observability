@@ -39,7 +39,7 @@ async function pushToLoki(log) {
       timeout: 5000
     });
 
-    // ✅ Correct logging based on status
+
     if (log.status === 'failure') {
       console.error('❌ Test Failed:', log.test_name, log.error);
     } else {
