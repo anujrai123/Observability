@@ -112,7 +112,7 @@
       "webhookId": "0fb9ac79-2a4a-45be-a996-63cc3e33ef89",
       "credentials": {
         "smtp": {
-          "id": "DqS3QqNSmywmyy5I",
+          "id": "",
           "name": "SMTP account"
         }
       }
