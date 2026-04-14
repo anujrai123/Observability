@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "url": "http://host.docker.internal:3100/loki/api/v1/query_range",
+        "url": "",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "url": "http://host.docker.internal:9090/api/v1/query",
+        "url": "",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
