@@ -112,7 +112,6 @@ On test failure:
 ## 🚀 Setup
 
 ```bash
-git clone https://github.com/<your-username>/playwright-observability-platform.git
 cd playwright-observability-platform
 npm install
 ```
