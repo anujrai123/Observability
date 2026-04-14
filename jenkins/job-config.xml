@@ -1,0 +1,55 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.StringParameterDefinition>
+<name>LOCATION</name>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<triggers>
+<org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@2.4.1">
+<spec/>
+<genericVariables>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>LOCATION</key>
+<value>$.alerts[0].labels.location</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+</genericVariables>
+<regexpFilterText/>
+<regexpFilterExpression/>
+<printPostContent>false</printPostContent>
+<printContributedVariables>false</printContributedVariables>
+<causeString>Generic Cause</causeString>
+<token>grafana-trigger</token>
+<tokenCredentialId/>
+<silentResponse>false</silentResponse>
+<overrideQuietPeriod>false</overrideQuietPeriod>
+<shouldNotFlattern>false</shouldNotFlattern>
+<allowSeveralTriggersPerBuild>false</allowSeveralTriggersPerBuild>
+</org.jenkinsci.plugins.gwt.GenericTrigger>
+</triggers>
+<concurrentBuild>true</concurrentBuild>
+<builders>
+<hudson.tasks.Shell>
+<command>echo "Running tests for $LOCATION" cd /Users/anujrai/Downloads/flask/playwright/tests # Run tests LOCATION=$LOCATION npx playwright test tests/clean.spec.js --workers=2 # Capture exit status TEST_STATUS=$? # Call n8n ONLY if failed if [ $TEST_STATUS -ne 0 ]; then echo "Test failed, calling n8n..." curl -X POST http://localhost:5678/webhook/test-failure -H "Content-Type: application/json" \ -d '{ "suite": "flipkart", "build_url": "'$BUILD_URL'", "run_id": "'$RUN_ID'", "job_name": "'$JOB_NAME'", "location": "'$LOCATION'" }' fi # IMPORTANT: return original status to Jenkins exit $TEST_STATUS</command>
+<configuredLocalRules/>
+</hudson.tasks.Shell>
+</builders>
+<publishers/>
+<buildWrappers/>
+</project>
