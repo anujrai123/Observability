@@ -1,4 +1,20 @@
+version: "3.8"
+
 services:
+
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - monitoring
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
 
   prometheus:
     image: prom/prometheus
@@ -13,7 +29,6 @@ services:
     ports:
       - "9090:9090"
 
-
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -25,35 +40,31 @@ services:
       - monitoring
     environment:
       - GF_SMTP_ENABLED=true
-      - GF_SMTP_HOST=smtp.gmail.com:587
-      - GF_SMTP_USER=
-      - GF_SMTP_PASSWORD=
-      - GF_SMTP_FROM_ADDRESS=your_email@gmail.com
+      - GF_SMTP_HOST=${GF_SMTP_HOST}
+      - GF_SMTP_USER=${GF_SMTP_USER}
+      - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+      - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS}
       - GF_SMTP_FROM_NAME=Grafana Alerts
       - GF_SMTP_SKIP_VERIFY=true
-
-
 
   loki:
     image: grafana/loki:2.9.0
     container_name: loki
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
     volumes:
       - loki_data:/loki
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
-
     networks:
       - monitoring
-
 
   aggregator:
     image: node:18
     container_name: aggregator
     working_dir: /app
     volumes:
-      - path of aggregator.js:/app
+      - ./aggregator:/app   # safer than absolute path
     command: ["node", "aggregator.js"]
     networks:
       - monitoring
@@ -68,6 +79,7 @@ volumes:
   prometheus_data:
   grafana_data:
   loki_data:
+  n8n_data:
 
 networks:
   monitoring:
