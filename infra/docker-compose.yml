@@ -62,6 +62,8 @@ services:
   aggregator:
     image: node:18
     container_name: aggregator
+    ports:
+      - "4000:4000"
     working_dir: /app
     volumes:
       - ./aggregator:/app   # safer than absolute path
