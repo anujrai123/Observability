@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BASE_URL = 'http://localhost:4000';
+const BASE_URL = 'http://host.docker.internal:4000';  //change the port in case your container is running on a different port
 
 async function sendMetrics({ suite, status, duration, location }) {
   try {
