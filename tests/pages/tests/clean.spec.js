@@ -17,10 +17,12 @@ test.describe.configure({ mode: 'serial' });
 
 
 test.beforeAll(async () => {
+  console.log("RUN_ID=" + RUN_ID);
   await startSuite(SUITE);
 });
 
 test.afterAll(async () => {
+  
   await endSuite(SUITE);
 });
 
