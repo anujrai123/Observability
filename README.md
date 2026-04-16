@@ -81,7 +81,8 @@ Each test pushes structured logs:
   "status": "failed",
   "error": "Timeout",
   "location": "India",
-  "run_id": "abc123"
+  "run_id": "abc123",
+  "failure_time": "1713264300"
 }
 ```
 
