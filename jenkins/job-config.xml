@@ -1,4 +1,3 @@
-This XML file does not appear to have any style information associated with it. The document tree is shown below.
 <project>
 <actions/>
 <description/>
@@ -46,7 +45,7 @@ This XML file does not appear to have any style information associated with it. 
 <concurrentBuild>true</concurrentBuild>
 <builders>
 <hudson.tasks.Shell>
-<command>echo "Running tests for $LOCATION" cd /playwright/tests # Run tests and capture output OUTPUT=$(LOCATION=$LOCATION npx playwright test tests/clean.spec.js --workers=5) TEST_STATUS=$? echo "$OUTPUT" # Extract RUN_ID RUN_ID=$(echo "$OUTPUT" | grep "RUN_ID=" | head -1 | cut -d '=' -f2) echo "Extracted RUN_ID=$RUN_ID" # Generate failure time FAILURE_TIME=$(date +%s) # Call n8n ONLY if failed if [ $TEST_STATUS -ne 0 ]; then echo "Test failed, calling n8n..." curl -X POST http://{n8n url}/webhook/test-failure \ -H "Content-Type: application/json" \ -d '{ "suite": "flipkart", "build_url": "'$BUILD_URL'", "run_id": "'$RUN_ID'", "job_name": "'$JOB_NAME'", "location": "'$LOCATION'", "failure_time": "'$FAILURE_TIME'" }' fi # Return original test status exit $TEST_STATUS</command>
+<command>echo "Running tests for $LOCATION" cd /Users/anujrai/Downloads/flask/playwright/tests # Run tests and capture output OUTPUT=$(LOCATION=$LOCATION npx playwright test tests/clean.spec.js --workers=5) TEST_STATUS=$? echo "$OUTPUT" # Extract RUN_ID RUN_ID=$(echo "$OUTPUT" | grep "RUN_ID=" | head -1 | cut -d '=' -f2) echo "Extracted RUN_ID=$RUN_ID" # Generate failure time FAILURE_TIME=$(date +%s) # Call n8n ONLY if failed if [ $TEST_STATUS -ne 0 ]; then echo "Test failed, calling n8n..." curl -X POST http://localhost:5678/webhook/test-failure \ -H "Content-Type: application/json" \ -d '{ "suite": "flipkart", "build_url": "'$BUILD_URL'", "run_id": "'$RUN_ID'", "job_name": "'$JOB_NAME'", "location": "'$LOCATION'", "failure_time": "'$FAILURE_TIME'" }' fi # Return original test status exit $TEST_STATUS</command>
 <configuredLocalRules/>
 </hudson.tasks.Shell>
 </builders>
