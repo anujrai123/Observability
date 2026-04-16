@@ -1,0 +1,230 @@
+{
+  "name": "Data_Enrichmment",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ef1bbd1c-5cbd-4227-ab73-df621c7aa9a2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -864,
+        16
+      ],
+      "id": "911f1b8c-2415-4f96-89c7-eae7c07be7b2",
+      "name": "Webhook",
+      "webhookId": "ef1bbd1c-5cbd-4227-ab73-df621c7aa9a2"
+    },
+    {
+      "parameters": {
+        "url": "http://prometheus url/api/v1/query_range",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "=playwright_test_total{location=\"{{$json.location}}\",status=\"failure\"}"
+            },
+            {
+              "name": "start",
+              "value": "={{$json.start_time}}"
+            },
+            {
+              "name": "end",
+              "value": "={{$json.end_time}}"
+            },
+            {
+              "name": "step",
+              "value": "30"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        160
+      ],
+      "id": "addfd74d-8422-4b64-aa6e-a8c2239237d8",
+      "name": "Prometheus Metrics"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "79fd122d-b713-4b82-9711-e325e593615e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      suite: $node[\"Webhook\"].json.body.suite,\n      run_id: $node[\"Webhook\"].json.body.run_id,\n      location: $node[\"Webhook\"].json.body.location,\n      build_url: $node[\"Webhook\"].json.body.build_url,\n\n      logs: $node[\"Loki Logs\"].json.data.result.length > 0\n        ? $node[\"Loki Logs\"].json.data.result[0].values.map(v => v[1]).join(\"\\n\")\n        : \"No logs found\",\n\n      failure_count: $node[\"Prometheus Metrics\"].json.data.result.length > 0\n        ? $node[\"Prometheus Metrics\"].json.data.result[0].values.slice(-1)[0][1]\n        : \"0\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        16
+      ],
+      "id": "998bd5a7-a317-49a1-b35e-e1950c4e597d",
+      "name": "Data Enrichment"
+    },
+    {
+      "parameters": {
+        "jsCode": "const failureTime = parseInt($input.first().json.body.failure_time);\n\n// Define time window (last 10 minutes)\nconst end = failureTime;\nconst start = failureTime - 600;\n\nreturn [\n  {\n    json: {\n      suite: $input.first().json.body.suite,\n      run_id: $input.first().json.body.run_id,\n      location: $input.first().json.body.location,\n      build_url: $input.first().json.body.build_url,\n\n      start_time: start,\n      end_time: end\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        16
+      ],
+      "id": "570d56ee-c2e6-43f9-97f6-5880b4e6893a",
+      "name": "Picking the metrics"
+    },
+    {
+      "parameters": {
+        "url": "http://loki url/loki/api/v1/query_range",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=query",
+              "value": "={run_id=\"{{$json.run_id}}\", location=\"{{$json.location}}\"} |= \"error\""
+            },
+            {
+              "name": "limit",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        -112
+      ],
+      "id": "b148e50d-16db-4277-b03d-153fc583dd74",
+      "name": "Loki Logs"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        16
+      ],
+      "id": "ef0a0c6a-2a7f-46be-a06c-9b0d6af91599",
+      "name": "Send email1",
+      "webhookId": "49ced3b4-f02a-43e4-b778-252bc96039b4",
+      "credentials": {
+        "smtp": {
+          "id": "DqS3QqNSmywmyy5I",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Picking the metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prometheus Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Data Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Send email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picking the metrics": {
+      "main": [
+        [
+          {
+            "node": "Prometheus Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loki Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loki Logs": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "3b1fa1e8-f6da-4936-bbde-b45b76985150",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7d69fcc9f72f61a1b4b55684875da003d91aa6d4ae0ff158174ff32682c396c7"
+  },
+  "id": "FfSKFAe5lJlLFjRh",
+  "tags": []
+}
